@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vivify — Luxury Jewelry Platform</title>
+<meta name="description" content="Full-stack digital platform for high-end jewelry ateliers — immutable provenance, financial ledger, blue-green deployment.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --gold: #D4AF37;
+  --gold-light: #E8D48B;
+  --gold-dim: #B8960F;
+  --bg: #0a0a0a;
+  --bg2: #111;
+  --bg3: #1a1a1a;
+  --bg4: #222;
+  --text: #e8e8e8;
+  --text-dim: #888;
+  --text-muted: #555;
+  --border: #2a2a2a;
+  --green: #4ade80;
+  --red: #f87171;
+  --blue: #60a5fa;
+}
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', -apple-system, system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+::selection { background: rgba(212,175,55,0.3); }
+
+/* Hero */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 80px 24px;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background:
+    radial-gradient(ellipse 800px 600px at 50% 40%, rgba(212,175,55,0.06), transparent),
+    radial-gradient(ellipse 400px 400px at 20% 80%, rgba(212,175,55,0.03), transparent),
+    radial-gradient(ellipse 400px 400px at 80% 20%, rgba(96,165,250,0.03), transparent);
+  pointer-events: none;
+}
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  font-size: 13px;
+  color: var(--text-dim);
+  margin-bottom: 32px;
+  background: rgba(212,175,55,0.04);
+}
+.hero-badge .dot {
+  width: 6px; height: 6px;
+  background: var(--green);
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+.hero h1 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(48px, 8vw, 96px);
+  font-weight: 700;
+  letter-spacing: -2px;
+  line-height: 1;
+  margin-bottom: 24px;
+}
+.hero h1 .gold { color: var(--gold); }
+.hero .tagline {
+  font-size: clamp(16px, 2.5vw, 22px);
+  color: var(--text-dim);
+  max-width: 600px;
+  margin-bottom: 40px;
+  font-weight: 300;
+}
+.hero-buttons {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.btn {
+  padding: 12px 28px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s;
+  cursor: pointer;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn-gold {
+  background: var(--gold);
+  color: #000;
+}
+.btn-gold:hover { background: var(--gold-light); transform: translateY(-1px); }
+.btn-outline {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+.btn-outline:hover { border-color: var(--gold); color: var(--gold); }
+
+/* Section */
+section {
+  padding: 100px 24px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.section-label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--gold);
+  margin-bottom: 12px;
+}
+.section-title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(28px, 4vw, 42px);
+  font-weight: 600;
+  margin-bottom: 16px;
+  letter-spacing: -1px;
+}
+.section-subtitle {
+  font-size: 16px;
+  color: var(--text-dim);
+  max-width: 600px;
+  margin-bottom: 48px;
+}
+
+/* Features Grid */
+.features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+.feature-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 28px;
+  transition: all 0.25s;
+  position: relative;
+  overflow: hidden;
+}
+.feature-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.feature-card:hover {
+  border-color: var(--gold-dim);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(212,175,55,0.08);
+}
+.feature-card:hover::before { opacity: 1; }
+.feature-icon {
+  font-size: 28px;
+  margin-bottom: 16px;
+  display: block;
+}
+.feature-card h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.feature-card p {
+  font-size: 14px;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+
+/* TUI Grid */
+.tui-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+.tui-item {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  transition: all 0.2s;
+}
+.tui-item:hover { border-color: var(--gold-dim); }
+.tui-icon { font-size: 24px; }
+.tui-info .name { font-size: 14px; font-weight: 600; }
+.tui-info .desc { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+.tui-info .size { font-size: 11px; color: var(--text-muted); margin-top: 4px; font-family: monospace; }
+
+/* Tech Stack */
+.tech-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+}
+.tech-item {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+}
+.tech-item .layer {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--gold);
+  margin-bottom: 4px;
+}
+.tech-item .tech {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Code block */
+.code-block {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: 24px;
+}
+.code-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: var(--bg3);
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--text-dim);
+}
+.code-dot { width: 8px; height: 8px; border-radius: 50%; }
+.code-dot.r { background: #ff5f56; }
+.code-dot.y { background: #ffbd2e; }
+.code-dot.g { background: #27c93f; }
+.code-block pre {
+  padding: 20px;
+  font-size: 13px;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  line-height: 1.7;
+  overflow-x: auto;
+  color: var(--text-dim);
+}
+.code-block pre .cmd { color: var(--text); }
+.code-block pre .comment { color: var(--text-muted); }
+.code-block pre .gold { color: var(--gold); }
+.code-block pre .green { color: var(--green); }
+
+/* Divider */
+.divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border), transparent);
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* Footer */
+footer {
+  text-align: center;
+  padding: 60px 24px;
+  color: var(--text-muted);
+  font-size: 13px;
+  border-top: 1px solid var(--border);
+}
+footer a { color: var(--gold); text-decoration: none; }
+footer a:hover { text-decoration: underline; }
+
+/* Stats bar */
+.stats {
+  display: flex;
+  justify-content: center;
+  gap: 48px;
+  padding: 40px 24px;
+  flex-wrap: wrap;
+}
+.stat { text-align: center; }
+.stat-value {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--gold);
+}
+.stat-label {
+  font-size: 12px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 4px;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .features { grid-template-columns: 1fr; }
+  .tui-grid { grid-template-columns: 1fr; }
+  .tech-grid { grid-template-columns: 1fr; }
+  .stats { gap: 24px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-badge">
+    <span class="dot"></span>
+    Full-stack platform
+  </div>
+  <h1>Viv<span class="gold">ify</span></h1>
+  <p class="tagline">
+    Digital platform for high-end jewelry ateliers — immutable provenance,
+    financial ledger, blue-green deployment.
+  </p>
+  <div class="hero-buttons">
+    <a href="https://github.com/Sebastiano-cr/vivify-luxury-platform" class="btn btn-gold">
+      View on GitHub
+    </a>
+    <a href="https://github.com/Sebastiano-cr/vivify-luxury-platform/tree/main/tui" class="btn btn-outline">
+      TUI Arsenal
+    </a>
+  </div>
+</section>
+
+<!-- Stats -->
+<div class="stats">
+  <div class="stat">
+    <div class="stat-value">83</div>
+    <div class="stat-label">Tests Passing</div>
+  </div>
+  <div class="stat">
+    <div class="stat-value">7</div>
+    <div class="stat-label">TUI Apps</div>
+  </div>
+  <div class="stat">
+    <div class="stat-value">14</div>
+    <div class="stat-label">API Modules</div>
+  </div>
+  <div class="stat">
+    <div class="stat-value">128</div>
+    <div class="stat-label">Files</div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- Features -->
+<section>
+  <div class="section-label">Features</div>
+  <h2 class="section-title">Built for jewelers, by engineers</h2>
+  <p class="section-subtitle">
+    From catalog management to immutable provenance tracking —
+    everything a luxury atelier needs.
+  </p>
+
+  <div class="features">
+    <div class="feature-card">
+      <span class="feature-icon">💎</span>
+      <h3>Jewel Catalog</h3>
+      <p>CRUD with full validation, QR codes, AI-powered descriptions via local LLM (Ollama), and certificate generation.</p>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">🔗</span>
+      <h3>Hashchain</h3>
+      <p>SHA256-linked immutable audit trail per jewel. Every operation creates a tamper-evident entry in the chain.</p>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">💰</span>
+      <h3>Financial Ledger</h3>
+      <p>Double-entry accounting with automated transaction creation on sale. Channel-based profit tracking and real-time P&L.</p>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">🖥️</span>
+      <h3>Web Terminal</h3>
+      <p>Real browser-based terminal via xterm.js + WebSocket. Multiple tabs, tmux persistence, Ctrl+Shift+T shortcut.</p>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">📊</span>
+      <h3>Monitoring</h3>
+      <p>Unified health endpoint checking 5 services in parallel. Service status dashboard with live updates.</p>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">🔄</span>
+      <h3>Blue-Green Deploy</h3>
+      <p>Atomic Nginx switch with health checks and instant rollback. Zero-downtime deployments with systemd.</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- TUI Arsenal -->
+<section>
+  <div class="section-label">TUI Arsenal</div>
+  <h2 class="section-title">7 terminal apps</h2>
+  <p class="section-subtitle">
+    Go/Bubble Tea apps for finance, catalog, SOC, monitoring,
+    backup, Zellij, and a central hub.
+  </p>
+
+  <div class="tui-grid">
+    <div class="tui-item">
+      <span class="tui-icon">💰</span>
+      <div class="tui-info">
+        <div class="name">lazyledger</div>
+        <div class="desc">Finance dashboard</div>
+        <div class="size">9.7MB</div>
+      </div>
+    </div>
+    <div class="tui-item">
+      <span class="tui-icon">💎</span>
+      <div class="tui-info">
+        <div class="name">lazyvivify</div>
+        <div class="desc">Jewel catalog</div>
+        <div class="size">9.8MB</div>
+      </div>
+    </div>
+    <div class="tui-item">
+      <span class="tui-icon">🧠</span>
+      <div class="tui-info">
+        <div class="name">lazysoc</div>
+        <div class="desc">SOC gateway monitor</div>
+        <div class="size">9.6MB</div>
+      </div>
+    </div>
+    <div class="tui-item">
+      <span class="tui-icon">📊</span>
+      <div class="tui-info">
+        <div class="name">lazymon</div>
+        <div class="desc">Service health</div>
+        <div class="size">9.5MB</div>
+      </div>
+    </div>
+    <div class="tui-item">
+      <span class="tui-icon">💾</span>
+      <div class="tui-info">
+        <div class="name">lazybackup</div>
+        <div class="desc">DB backups</div>
+        <div class="size">4.1MB</div>
+      </div>
+    </div>
+    <div class="tui-item">
+      <span class="tui-icon">🚀</span>
+      <div class="tui-info">
+        <div class="name">lazyzellij</div>
+        <div class="desc">Multiplexer</div>
+        <div class="size">2.6MB</div>
+      </div>
+    </div>
+    <div class="tui-item">
+      <span class="tui-icon">⚡</span>
+      <div class="tui-info">
+        <div class="name">lazyhub</div>
+        <div class="desc">Central menu</div>
+        <div class="size">4.2MB</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- Tech Stack -->
+<section>
+  <div class="section-label">Tech Stack</div>
+  <h2 class="section-title">What powers Vivify</h2>
+  <p class="section-subtitle">
+    Production-grade stack with modern tools and battle-tested libraries.
+  </p>
+
+  <div class="tech-grid">
+    <div class="tech-item">
+      <div class="layer">Backend</div>
+      <div class="tech">Python 3.13 · FastAPI · Uvicorn</div>
+    </div>
+    <div class="tech-item">
+      <div class="layer">Database</div>
+      <div class="tech">SQLite3 (WAL mode)</div>
+    </div>
+    <div class="tech-item">
+      <div class="layer">Hashchain</div>
+      <div class="tech">SHA256 (tamper-evident)</div>
+    </div>
+    <div class="tech-item">
+      <div class="layer">TUIs</div>
+      <div class="tech">Go 1.25 · Bubble Tea · Lipgloss</div>
+    </div>
+    <div class="tech-item">
+      <div class="layer">Web Terminal</div>
+      <div class="tech">xterm.js 5.3 · WebSocket · PTY</div>
+    </div>
+    <div class="tech-item">
+      <div class="layer">Ledger</div>
+      <div class="tech">Node.js 23 · Hono · node:sqlite</div>
+    </div>
+    <div class="tech-item">
+      <div class="layer">Security</div>
+      <div class="tech">Nginx CIS L1/L2 · systemd</div>
+    </div>
+    <div class="tech-item">
+      <div class="layer">Deploy</div>
+      <div class="tech">Blue-green · health checks</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- Quick Start -->
+<section>
+  <div class="section-label">Quick Start</div>
+  <h2 class="section-title">Up and running in 3 steps</h2>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span class="code-dot r"></span>
+      <span class="code-dot y"></span>
+      <span class="code-dot g"></span>
+      Terminal
+    </div>
+    <pre><span class="comment"># Clone and install</span>
+<span class="cmd">git clone</span> https://github.com/Sebastiano-cr/vivify-luxury-platform.git
+<span class="cmd">cd</span> vivify-luxury-platform
+<span class="cmd">pip install</span> -r requirements.txt
+
+<span class="comment"># Start backend</span>
+<span class="cmd">python -m</span> uvicorn backend.server:app <span class="gold">--port 3334</span>
+
+<span class="comment"># Open dashboard</span>
+<span class="green">http://localhost:3334</span></pre>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <p>
+    <a href="https://github.com/Sebastiano-cr/vivify-luxury-platform">GitHub</a>
+    · <a href="https://github.com/Sebastiano-cr/vivify-luxury-platform/blob/main/LICENSE">MIT License</a>
+    · <a href="https://github.com/Sebastiano-cr">Sebastiano-cr</a>
+  </p>
+  <p style="margin-top: 8px;">Vivify — Luxury Jewelry Management Platform</p>
+</footer>
+
+</body>
+</html>
