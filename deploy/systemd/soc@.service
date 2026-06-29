@@ -1,0 +1,41 @@
+# SOC Gateway — Systemd Template
+[Unit]
+Description=SOC Gateway (%i)
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/vivify/releases/%i/soc
+EnvironmentFile=/var/www/vivify/shared/.env
+Environment=COLOR=%i
+ExecStart=/var/www/vivify/deploy/bin/soc-start %i
+
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+ProtectClock=yes
+MemoryDenyWriteExecute=yes
+NoNewPrivileges=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+SystemCallFilter=@system-service
+CapabilityBoundingSet=
+AmbientCapabilities=
+RestrictAddressFamilies=AF_INET AF_UNIX
+ReadWritePaths=/var/www/vivify/shared /var/www/vivify/releases/%i/soc
+LimitNOFILE=16384
+MemoryMax=1G
+Restart=always
+RestartSec=5
+TimeoutStopSec=30
+
+[Install]
+WantedBy=multi-user.target

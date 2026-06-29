@@ -1,0 +1,87 @@
+#!/bin/bash
+# =============================================================================
+# deploy-vivify — Blue/Green deployment with zero-downtime Nginx switch
+# CIS-compliant: health checks, rollback on failure, atomic switch
+# =============================================================================
+set -euo pipefail
+
+COLOR="${1:?Usage: deploy-vivify <blue|green> [--branch main] [--skip-build]}"
+BRANCH="main"
+SKIP_BUILD=false
+for arg in "$@"; do
+  case "$arg" in --branch=*) BRANCH="${arg#*=}" ;; --skip-build) SKIP_BUILD=true ;; esac
+done
+
+RELEASE_DIR="/var/www/vivify/releases/$COLOR"
+SHARED_DIR="/var/www/vivify/shared"
+NGINX_CONF="/etc/nginx/sites-available/vivify.conf"
+TIMESTAMP=$(date +%s)
+
+echo "[deploy-vivify] Deploying $COLOR (branch=$BRANCH)"
+
+# ── 1. Clone or pull ──
+if [ -d "$RELEASE_DIR/.git" ]; then
+  cd "$RELEASE_DIR" && git fetch origin && git checkout "$BRANCH" && git pull
+else
+  mkdir -p "$RELEASE_DIR"
+  git clone --branch "$BRANCH" https://github.com/seu-repo/vivify.git "$RELEASE_DIR"
+fi
+echo "$BRANCH-$(git rev-parse --short HEAD)" > "$RELEASE_DIR/version.txt"
+
+# ── 2. Link shared resources ──
+for dir in soc vivify/backend ledger; do
+  ln -sf "$SHARED_DIR/.env" "$RELEASE_DIR/$dir/.env" 2>/dev/null || true
+done
+ln -sf "$SHARED_DIR/vivify_backend.db" "$RELEASE_DIR/vivify/backend/vivify_backend.db"
+ln -sf "$SHARED_DIR/ledger.db" "$RELEASE_DIR/ledger/ledger.db"
+
+# ── 3. Build ──
+if [ "$SKIP_BUILD" = false ]; then
+  # Vivify (Python)
+  pip install -r "$RELEASE_DIR/vivify/backend/requirements.txt" --quiet 2>/dev/null || true
+  # SOC (Python)
+  pip install -r "$RELEASE_DIR/soc/requirements.txt" --quiet 2>/dev/null || true
+  # Ledger (Node)
+  cd "$RELEASE_DIR/ledger" && pnpm install --frozen-lockfile 2>/dev/null && pnpm run build 2>/dev/null
+fi
+
+# ── 4. Restart systemd service ──
+systemctl daemon-reload
+systemctl restart "vivify@$COLOR" "soc@$COLOR" "ledger@$COLOR"
+sleep 3
+
+# ── 5. Health check (all services, with retry) ──
+declare -A HEALTH=(
+  ["vivify"]="http://127.0.0.1:$( [ "$COLOR" = blue ] && echo 3334 || echo 4334 )/health"
+  ["soc"]="http://127.0.0.1:$( [ "$COLOR" = blue ] && echo 3333 || echo 4333 )/health"
+  ["ledger"]="http://127.0.0.1:$( [ "$COLOR" = blue ] && echo 3002 || echo 4002 )/accounts"
+)
+for svc in "${!HEALTH[@]}"; do
+  url="${HEALTH[$svc]}"
+  for i in 1 2 3; do
+    if curl --fail -s "$url" > /dev/null 2>&1; then
+      echo "[deploy-vivify] ✅ $svc ($COLOR) OK"
+      break
+    fi
+    echo "[deploy-vivify] ⏳ $svc health check attempt $i/3..."
+    sleep 2
+  done
+  if ! curl --fail -s "$url" > /dev/null 2>&1; then
+    echo "[deploy-vivify] ❌ $svc ($COLOR) failed health check — rolling back"
+    /var/www/vivify/deploy/bin/rollback-vivify
+    exit 1
+  fi
+done
+
+# ── 6. Switch Nginx upstreams ──
+if [ "$COLOR" = blue ]; then
+  sed -i 's/server 127.0.0.1:4[0-9]\{3\}/server 127.0.0.1:3[0-9]\{3\}/g; s/server 127.0.0.1:40[0-9]\{2\}/server 127.0.0.1:30[0-9]\{2\}/g' "$NGINX_CONF"
+else
+  sed -i 's/server 127.0.0.1:3[0-9]\{3\}/server 127.0.0.1:4[0-9]\{3\}/g; s/server 127.0.0.1:30[0-9]\{2\}/server 127.0.0.1:40[0-9]\{2\}/g' "$NGINX_CONF"
+fi
+nginx -t && systemctl reload nginx
+
+# ── 7. Update current symlink ──
+ln -sfn "$RELEASE_DIR" /var/www/vivify/current
+
+echo "[deploy-vivify] ✅ Deploy $COLOR concluído em $(date -uIseconds)"

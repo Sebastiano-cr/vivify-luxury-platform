@@ -1,0 +1,46 @@
+# Vivify Backend — Systemd Template
+# Usage: vivify@blue → /var/www/vivify/releases/blue/vivify/backend
+#        vivify@green → /var/www/vivify/releases/green/vivify/backend
+# Port mapping is handled by deploy/bin/vivify-start wrapper
+[Unit]
+Description=Vivify Backend (%i)
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/vivify/releases/%i/vivify/backend
+EnvironmentFile=/var/www/vivify/shared/.env
+Environment=COLOR=%i
+ExecStart=/var/www/vivify/deploy/bin/vivify-start %i
+
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+ProtectClock=yes
+ProtectProc=invisible
+MemoryDenyWriteExecute=yes
+NoNewPrivileges=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+SystemCallFilter=@system-service
+CapabilityBoundingSet=
+AmbientCapabilities=
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+ReadWritePaths=/var/www/vivify/shared /var/www/vivify/releases/%i/vivify/backend
+LimitNOFILE=16384
+LimitNPROC=512
+MemoryMax=512M
+Restart=always
+RestartSec=5
+TimeoutStopSec=10
+
+[Install]
+WantedBy=multi-user.target

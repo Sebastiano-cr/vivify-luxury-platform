@@ -1,0 +1,11 @@
+#!/bin/bash
+# Wrapper: maps color → port and starts Ledger
+set -e
+COLOR="$1"
+case "$COLOR" in
+  blue)  PORT=3002 ;;
+  green) PORT=4002 ;;
+  *)     echo "Unknown color: $COLOR" >&2; exit 1 ;;
+esac
+exec /usr/bin/env node /var/www/vivify/releases/"$COLOR"/ledger/dist/index.js \
+    --port "$PORT" --host 127.0.0.1

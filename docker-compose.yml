@@ -1,0 +1,40 @@
+version: "3.9"
+
+services:
+  vivify-backend:
+    build:
+      context: .
+      dockerfile: deploy/docker/Dockerfile.backend
+    ports:
+      - "3334:3334"
+    environment:
+      - VIVIFY_DB_PATH=/data/vivify_backend.db
+      - AUDIT_CHAIN_DB=/data/audit_chain.db
+      - LEDGER_URL=http://ledger:3002
+    volumes:
+      - vivify_data:/data
+    depends_on:
+      - ledger
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3334/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  ledger:
+    build:
+      context: .
+      dockerfile: deploy/docker/Dockerfile.ledger
+    ports:
+      - "3002:3002"
+    volumes:
+      - ledger_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3002/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  vivify_data:
+  ledger_data:

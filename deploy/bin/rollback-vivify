@@ -1,0 +1,18 @@
+#!/bin/bash
+# =============================================================================
+# rollback-vivify — Switch to the OTHER color (atomic rollback)
+# =============================================================================
+set -euo pipefail
+
+CURRENT=$(readlink /var/www/vivify/current 2>/dev/null || echo "")
+if [[ "$CURRENT" == *"blue"* ]]; then
+  TARGET="green"
+elif [[ "$CURRENT" == *"green"* ]]; then
+  TARGET="blue"
+else
+  echo "[rollback-vivify] ❌ Unknown current version, cannot rollback"
+  exit 1
+fi
+
+echo "[rollback-vivify] 🔄 Switching from $(basename "$CURRENT") → $TARGET"
+/var/www/vivify/deploy/bin/deploy-vivify "$TARGET" --skip-build

@@ -1,0 +1,13 @@
+#!/bin/bash
+# Wrapper: maps color → port and starts Vivify Backend
+# Usage: vivify-start <blue|green>
+set -e
+COLOR="$1"
+case "$COLOR" in
+  blue)  PORT=3334 ;;
+  green) PORT=4334 ;;
+  *)     echo "Unknown color: $COLOR" >&2; exit 1 ;;
+esac
+exec /usr/bin/env python3 -m uvicorn server:app \
+    --host 127.0.0.1 --port "$PORT" --workers 2 \
+    --log-level warning

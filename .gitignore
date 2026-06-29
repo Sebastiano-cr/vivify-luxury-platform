@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+.venv/
+venv/
+
+# Go
+tui/bin/
+*.exe
+*.test
+*.out
+
+# Node
+node_modules/
+ledger/node_modules/
+
+# Data
+*.db
+*.db-journal
+*.db-wal
+signals_db.json
+
+# Env
+.env
+.env.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Deploy artifacts
+deploy/bin/*.sh
+!deploy/bin/*.sh

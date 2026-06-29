@@ -1,0 +1,12 @@
+#!/bin/bash
+# Wrapper: maps color → port and starts SOC Gateway
+set -e
+COLOR="$1"
+case "$COLOR" in
+  blue)  PORT=3333 ;;
+  green) PORT=4333 ;;
+  *)     echo "Unknown color: $COLOR" >&2; exit 1 ;;
+esac
+exec /usr/bin/env python3 -m uvicorn soc.gateway.server:app \
+    --host 127.0.0.1 --port "$PORT" --workers 2 \
+    --log-level warning

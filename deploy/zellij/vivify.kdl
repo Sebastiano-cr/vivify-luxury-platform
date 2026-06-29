@@ -1,0 +1,48 @@
+layout {
+    default_tab_template {
+        pane size="1" type="plugin" plugin="tab-bar"
+        children
+        pane size="2" type="plugin" plugin="status-bar"
+    }
+    tab name="Servicos" {
+        pane command="bash" {
+            args ["-c", "lazyhub"]
+        }
+        pane command="bash" {
+            args ["-c", "echo '=== SOC Gateway :3333 ==='; curl -s http://127.0.0.1:3333/health | python3 -m json.tool 2>/dev/null || echo 'SOC offline'"]
+        }
+        pane command="bash" {
+            args ["-c", "echo '=== Ledger :3002 ==='; curl -s http://127.0.0.1:3002/accounts | python3 -m json.tool 2>/dev/null || echo 'Ledger offline'"]
+        }
+        pane command="bash" {
+            args ["-c", "echo '=== Vivify :3334 ==='; curl -s -o /dev/null -w 'HTTP %{http_code}' http://127.0.0.1:3334/jewels/ 2>/dev/null; echo ''"]
+        }
+    }
+    tab name="Logs" {
+        pane command="bash" {
+            args ["-c", "tail -f /var/www/vivify/shared/logs/vivify.log 2>/dev/null || echo 'Sem logs de producao'; exec tail -f /dev/null"]
+        }
+        pane command="bash" {
+            args ["-c", "journalctl -u vivify@blue -f --no-pager 2>/dev/null || echo 'Sem systemd'; exec tail -f /dev/null"]
+        }
+        pane command="bash" {
+            args ["-c", "echo '=== Historico de deploy ==='; cat /var/www/vivify/releases/*/version.txt 2>/dev/null || echo 'Sem dados'"]
+        }
+    }
+    tab name="Deploy" {
+        pane command="bash" {
+            args ["-c", "echo 'Blue/Green Deploy'; echo; echo '  deploy-vivify blue   — Deploy ambiente Blue'; echo '  deploy-vivify green  — Deploy ambiente Green'; echo '  rollback-vivify     — Rollback'; echo; exec bash"]
+        }
+        pane command="bash" {
+            args ["-c", "watch -n 5 'curl -s http://127.0.0.1:3334/health 2>/dev/null || echo offline'"]
+        }
+    }
+    tab name="Monitor" {
+        pane command="bash" {
+            args ["-c", "htop"]
+        }
+        pane command="bash" {
+            args ["-c", "watch -n 2 'echo SOC:; curl -s http://127.0.0.1:3333/health 2>/dev/null | python3 -c \"import sys,json; d=json.load(sys.stdin); print(f\\\"  Providers: {d.get(\\'providers_up\\',\\\"?\\\")}/{len(d.get(\\'providers\\',[]))}\\\")\" 2>/dev/null || echo offline'"]
+        }
+    }
+}
