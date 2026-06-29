@@ -1,0 +1,35 @@
+<div style="padding:16px;">
+  <h3 style="margin-bottom:12px;">Hashchain Integrity</h3>
+  <div id="audit-stats" style="margin-bottom:16px;">
+    <span id="audit-total" style="background:#1a1a1a;padding:4px 12px;border-radius:6px;">—</span>
+    <span id="audit-valid" style="background:#1a1a1a;padding:4px 12px;border-radius:6px;margin-left:8px;">—</span>
+  </div>
+  <table style="width:100%;border-collapse:collapse;font-size:12px;">
+    <thead>
+      <tr style="border-bottom:1px solid #333;">
+        <th style="text-align:left;padding:6px 8px;">Event</th>
+        <th style="text-align:left;padding:6px 8px;">Jewel</th>
+        <th style="text-align:left;padding:6px 8px;">Timestamp</th>
+        <th style="text-align:left;padding:6px 8px;">Hash (8 chars)</th>
+      </tr>
+    </thead>
+    <tbody id="audit-rows"></tbody>
+  </table>
+</div>
+<script>
+fetch('/jewels/chain?limit=50')
+  .then(r => r.json())
+  .then(data => {
+    const entries = data.entries || [];
+    document.getElementById('audit-total').textContent = 'Total: ' + entries.length;
+    const tbody = document.getElementById('audit-rows');
+    tbody.innerHTML = entries.map(e =>
+      `<tr style="border-bottom:1px solid #222;">
+        <td style="padding:4px 8px;">${e.event_type || '—'}</td>
+        <td style="padding:4px 8px;">${(e.session_id || '').slice(0,8)}</td>
+        <td style="padding:4px 8px;">${(e.timestamp || '').slice(0,19)}</td>
+        <td style="padding:4px 8px;font-family:monospace;font-size:11px;color:#D4AF37;">${(e.current_hash || '').slice(0,8)}</td>
+      </tr>`
+    ).join('');
+  });
+</script>

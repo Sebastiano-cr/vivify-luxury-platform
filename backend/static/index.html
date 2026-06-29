@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vivify — Luxury Jewelry Platform</title>
+<link rel="stylesheet" href="/static/lib/xterm.css">
+<link rel="stylesheet" href="/static/vivify.css">
+</head>
+<body>
+<div id="app">
+  <aside id="sidebar">
+    <div class="logo">✦ V</div>
+    <nav>
+      <button class="nav-btn active" data-view="dashboard" title="Dashboard">⬟</button>
+      <button class="nav-btn" data-view="terminal" title="Terminal">🖥</button>
+      <button class="nav-btn" data-view="health" title="Health">❤</button>
+    </nav>
+    <div class="sidebar-footer">
+      <span id="status-dot" class="dot green"></span>
+    </div>
+  </aside>
+
+  <main id="main">
+    <!-- Dashboard View -->
+    <section id="view-dashboard" class="view active">
+      <header>
+        <h1>Vivify</h1>
+        <span class="subtitle">Luxury Jewelry Platform</span>
+      </header>
+      <div id="hub-grid"></div>
+    </section>
+
+    <!-- Terminal View -->
+    <section id="view-terminal" class="view">
+      <header>
+        <h1>Terminal</h1>
+        <div id="tabstrip">
+          <div class="tab active" data-idx="0">bash <span class="tab-close">×</span></div>
+        </div>
+        <button id="add-tab" title="New tab">+</button>
+      </header>
+      <div id="terminal-container"></div>
+    </section>
+
+    <!-- Health View -->
+    <section id="view-health" class="view">
+      <header>
+        <h1>Service Health</h1>
+        <button id="refresh-health" class="btn-sm">↻ refresh</button>
+      </header>
+      <div id="health-grid"></div>
+    </section>
+  </main>
+</div>
+
+<div id="modal-overlay" class="hidden" onclick="closeModal(event)"></div>
+<div id="modal" class="hidden">
+  <div class="modal-header">
+    <span id="modal-title"></span>
+    <button class="modal-close" onclick="closeModal()">×</button>
+  </div>
+  <div id="modal-body"></div>
+</div>
+
+<script type="module" src="/static/vivify.js"></script>
+</body>
+</html>

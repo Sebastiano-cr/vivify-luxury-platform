@@ -1,4 +1,7 @@
+from pathlib import Path
+
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 
 from .storage.db import init_db
 from .api.jewels import router as jewels_router
@@ -17,13 +20,35 @@ from .api.finances import router as finances_router
 from .api.monitoring import router as monitoring_router
 from .middleware.subscription_middleware import SubscriptionMiddleware
 from .middleware.security import configure_security
+from .routes.terminal_routes import router as terminal_router
 
-app = FastAPI(title="Vivify API", version="0.1.0")
+from .services.scheduler import start_scheduler
+from contextlib import asynccontextmanager
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    start_scheduler()
+    yield
+
+
+STATIC_DIR = Path(__file__).resolve().parent / "static"
+
+app = FastAPI(title="Vivify API", version="0.1.0", lifespan=lifespan)
 
 configure_security(app)
 app.add_middleware(SubscriptionMiddleware)
 
 init_db()
+
+# Static files (dashboard frontend)
+if STATIC_DIR.exists():
+    app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
+
+    @app.get("/")
+    async def serve_index():
+        from fastapi.responses import FileResponse
+        return FileResponse(str(STATIC_DIR / "index.html"))
 
 app.include_router(jewels_router)
 app.include_router(certificates_router)
@@ -39,14 +64,7 @@ app.include_router(omnichannel_router)
 app.include_router(subscriptions_router)
 app.include_router(finances_router)
 app.include_router(monitoring_router)
-
-from .services.scheduler import start_scheduler
-
-
-@app.on_event("startup")
-async def _start_scheduler():
-    start_scheduler()
-
+app.include_router(terminal_router)
 
 @app.get("/health")
 def health():
@@ -55,4 +73,4 @@ def health():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("server:app", host="0.0.0.0", port=3334, reload=True)
+    uvicorn.run("backend.server:app", host="0.0.0.0", port=3334, reload=True)

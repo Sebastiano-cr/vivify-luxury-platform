@@ -5,7 +5,7 @@ from uuid import uuid4
 from typing import List, Optional
 
 from ..storage.db import fetchone, fetchall, execute
-from ..storage.hashchain import append_jewel_entry, get_jewel_chain
+from ..storage.hashchain import append_jewel_entry, get_jewel_chain, search as search_chain
 from ..models.jewel import JewelCreate, JewelUpdate, JewelOut, ProvenanceStep
 from ..models.enums import MetalType, GemType, JewelStatus
 from ..services.llm import SOCLLMService
@@ -118,6 +118,13 @@ def list_jewels(
         tuple(params) + (limit, skip),
     )
     return [_row_to_jewel(r) for r in rows]
+
+
+@router.get("/chain", response_model=dict)
+def get_all_chains(limit: int = 50):
+    """Return all hashchain entries across all jewels."""
+    result = search_chain(tenant_id="vivify", limit=limit)
+    return result
 
 
 @router.get("/{jewel_id}", response_model=JewelOut)

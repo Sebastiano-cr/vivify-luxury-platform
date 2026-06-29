@@ -1,6 +1,7 @@
 .PHONY: all build install clean lazyledger lazyvivify lazysoc lazyhub lazybackup lazyzellij lazymon run-ledger deps
 
 GO := go
+# Use absolute path if go not in PATH (e.g. /home/vector/go1.25/bin/go)
 BIN_DIR := $(HOME)/go/bin
 
 all: build
