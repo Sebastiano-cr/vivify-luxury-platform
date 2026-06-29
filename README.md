@@ -7,6 +7,7 @@
 [![Python 3.13](https://img.shields.io/badge/Python-3.13-blue?logo=python)](https://python.org)
 [![Go 1.25](https://img.shields.io/badge/Go-1.25-00ADD8?logo=go)](https://go.dev)
 [![Tests](https://img.shields.io/badge/tests-83%20passing-brightgreen)]()
+[![Docs](https://img.shields.io/badge/docs-live-brightgreen?logo=github)](https://sebastiano-cr.github.io/vivify-luxury-platform/)
 
 Vivify is a full-stack digital platform for high-end jewelry ateliers — from catalog management and immutable provenance tracking to sales, financial ledger, monitoring, and blue-green deployment.
 
@@ -20,7 +21,7 @@ Built with **FastAPI** (Python), **Bubble Tea** (Go TUIs), **SQLite**, and a **t
 |---------|----------|
 | Jewelry ateliers need digital certification + provenance | **Hashchain** — SHA256-linked immutable audit trail per jewel |
 | Spreadsheets for accounting and inventory | **Ledger** — double-entry accounting integrated at sale time |
-| Multiple tools, no unified operations view | **TUI arsenal** — 6 terminal apps for finance, catalog, SOC, monitoring, backup, and a hub menu |
+| Multiple tools, no unified operations view | **TUI arsenal** — 7 terminal apps for finance, catalog, SOC, monitoring, backup, zellij, and a hub menu |
 | Context switching between browser and terminal | **Web terminal** — xterm.js inside the dashboard, zero alt-tab |
 | Risky manual deploys | **Blue-green deployment** — atomic Nginx switch + health checks + rollback |
 
@@ -30,19 +31,23 @@ Built with **FastAPI** (Python), **Bubble Tea** (Go TUIs), **SQLite**, and a **t
 
 ```
 ┌──────────────────────────────────────────────────────────────────┐
-│                        Browser (Odysseus)                        │
+│                         Browser (:3334)                           │
 │  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────────────┐ │
 │  │ Dashboard │  │ Catalog  │  │ Finance  │  │ Terminal (xterm)  │ │
-│  └────┬─────┘  └────┬─────┘  └────┬─────┘  └────────┬─────────┘ │
-└───────┼──────────────┼──────────────┼───────────────────┼─────────┘
-        │              │              │                   │
-        ▼              ▼              ▼                   ▼ WebSocket
+│  │  (SPA)   │  │  (API)   │  │  (API)   │  │ (WebSocket PTY)   │ │
+│  └──────────┘  └────┬─────┘  └────┬─────┘  └────────┬─────────┘ │
+└──────────────────────┼──────────────┼───────────────────┼─────────┘
+                       │              │                   │
+                       ▼              ▼                   ▼
 ┌──────────────────────────────────────────────────────────────────┐
-│                        FastAPI Backend (:3334)                    │
+│                     FastAPI Backend (:3334)                        │
 │  ┌────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐ │
-│  │ Jewels │ │ Hashchain │ │ Ledger   │ │ Monitoring│ │ Security  │ │
-│  │ CRUD   │ │ (SHA256)  │ │ Client   │ │ Endpoint │ │ (CIS L1)  │ │
+│  │ Jewels │ │ Hashchain │ │ Ledger   │ │ Monitoring│ │ Terminal  │ │
+│  │ CRUD   │ │ (SHA256)  │ │ Client   │ │ Endpoint │ │  WebSocket│ │
 │  └────────┘ └──────────┘ └──────────┘ └──────────┘ └──────────┘ │
+│  ┌──────────────────────────────────────────────────────────────┐ │
+│  │ Static Files — SPA dashboard (index.html, JS, CSS, libs)     │ │
+│  └──────────────────────────────────────────────────────────────┘ │
 └──────────────────────────────────────────────────────────────────┘
         │                             │
         ▼                             ▼
@@ -69,9 +74,11 @@ git clone https://github.com/Sebastiano-cr/vivify-luxury-platform.git
 cd vivify-luxury-platform
 
 pip install -r requirements.txt
-cd backend
-python -m uvicorn server:app --reload --port 3334
+python -m uvicorn backend.server:app --port 3334
 ```
+
+Open **http://localhost:3334** — SPA dashboard with LazyHub,
+terminal, health check, and audit chain.
 
 ### 2. Ledger (double-entry accounting)
 
@@ -91,7 +98,15 @@ make all
 ~/go/bin/lazyhub
 ```
 
-### 4. Demo Script (one command)
+### 4. Dashboard (browser)
+
+Open **http://localhost:3334** — included SPA with:
+- **LazyHub** grid — 12 tool cards to launch and monitor
+- **Terminal** — xterm.js multi-tab with tmux persistence (`Ctrl+Shift+T`)
+- **Health** — live service status dashboard
+- **Audit Chain** — hashchain table viewer
+
+### 5. Demo Script (one command)
 
 ```bash
 bash scripts/demo.sh

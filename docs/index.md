@@ -1,3 +1,9 @@
+---
+layout: default
+title: Vivify — Luxury Jewelry Platform
+description: Full-stack digital platform for high-end jewelry ateliers
+---
+
 # Vivify — Luxury Jewelry Platform
 
 > *Full-stack digital platform for high-end jewelry ateliers*
