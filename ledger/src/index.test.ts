@@ -6,7 +6,7 @@ import { createAccountsRouter } from "./modules/accounts/http";
 import { createTransactionsRouter } from "./modules/transactions/http";
 import { errorHandler } from "./shared/middlewares/error-handler";
 import { idempotencyCaches } from "./shared/idempotency-cache";
-import { SQLiteDatabase } from "infra/sqlite-db";
+import { SQLiteDatabase } from "./infra/sqlite-db";
 
 describe("API Integration Tests", () => {
   let app: Hono;
